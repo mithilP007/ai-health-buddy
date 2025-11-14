@@ -58,6 +58,14 @@ def save_data(data):
 async def root():
     return FileResponse("index.html")
 
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse("manifest.json")
+
+@app.get("/service-worker.js")
+async def service_worker():
+    return FileResponse("service-worker.js")
+
 @app.post("/api/junk-food")
 async def log_junk_food(entry: JunkFoodEntry):
     data = load_data()
