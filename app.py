@@ -162,6 +162,79 @@ async def get_motivational_quote():
     import random
     return {"quote": random.choice(quotes)}
 
+
+
+@app.get("/api/monthly-stats")
+async def get_monthly_stats(year: int = None, month: int = None):
+    from datetime import datetime
+    data = load_data()
+    
+    # Use current month if not specified
+    if year is None or month is None:
+        now = datetime.now()
+        year = now.year
+        month = now.month
+    
+    month_str = f"{year}-{month:02d}"
+    
+    # Filter entries for the specific month
+    junk_food_month = [e for e in data["junk_food"] if e["date"].startswith(month_str)]
+    phone_usage_month = [e for e in data["phone_usage"] if e["date"].startswith(month_str)]
+    
+    # Calculate monthly stats
+    total_days = len(junk_food_month)
+    junk_food_days = sum(1 for e in junk_food_month if e["ate_junk_food"])
+    healthy_days = total_days - junk_food_days
+    money_saved = sum(e["junk_food_cost"] for e in junk_food_month if not e["ate_junk_food"])
+    
+    # Phone usage stats
+    total_phone_days = len(phone_usage_month)
+    avg_phone_usage = sum(e["usage_minutes"] for e in phone_usage_month) / total_phone_days if total_phone_days > 0 else 0
+    over_limit_days = sum(1 for e in phone_usage_month if e["usage_minutes"] > e["limit_minutes"])
+    
+    return {
+        "year": year,
+        "month": month,
+        "total_days_tracked": total_days,
+        "junk_food_days": junk_food_days,
+        "healthy_days": healthy_days,
+        "money_saved": round(money_saved, 2),
+        "avg_phone_usage": round(avg_phone_usage, 2),
+        "over_limit_days": over_limit_days,
+        "total_phone_days": total_phone_days
+    }
+
+@app.get("/api/daily-report")
+async def get_daily_report(date_str: str = None):
+    from datetime import date as dt_date
+    data = load_data()
+    
+    # Use today if not specified
+    if date_str is None:
+        date_str = dt_date.today().isoformat()
+    
+    junk_food_entry = next((e for e in data["junk_food"] if e["date"] == date_str), None)
+    phone_usage_entry = next((e for e in data["phone_usage"] if e["date"] == date_str), None)
+    
+    report = {
+        "date": date_str,
+        "junk_food_logged": junk_food_entry is not None,
+        "phone_usage_logged": phone_usage_entry is not None,
+    }
+    
+    if junk_food_entry:
+        report["ate_junk_food"] = junk_food_entry["ate_junk_food"]
+        report["junk_food_cost"] = junk_food_entry["junk_food_cost"]
+        report["money_saved"] = 0 if junk_food_entry["ate_junk_food"] else junk_food_entry["junk_food_cost"]
+        report["junk_food_notes"] = junk_food_entry.get("notes", "")
+    
+    if phone_usage_entry:
+        report["usage_minutes"] = phone_usage_entry["usage_minutes"]
+        report["limit_minutes"] = phone_usage_entry["limit_minutes"]
+        report["over_limit"] = phone_usage_entry["usage_minutes"] > phone_usage_entry["limit_minutes"]
+        report["phone_notes"] = phone_usage_entry.get("notes", "")
+    
+    return report
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
