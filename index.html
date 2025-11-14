@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Health Buddy - Track Your Health & Phone Usage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .quote-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 AI Health Buddy</h1>
+        <p class="subtitle">Your personal assistant for health tracking and digital wellness</p>
+        
+        <div class="quote-box" id="quoteBox">
+            Loading motivation...
+        </div>
+
+        <div class="dashboard" id="dashboard">
+            <div class="stat-card">
+                <div class="stat-value" id="healthyDays">0</div>
+                <div class="stat-label">Healthy Days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="moneySaved">₹0</div>
+                <div class="stat-label">Money Saved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgUsage">0m</div>
+                <div class="stat-label">Avg Phone Usage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="overLimitDays">0</div>
+                <div class="stat-label">Over Limit Days</div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>🍔 Today's Junk Food Status</h2>
+            <form id="junkFoodForm">
+                <div class="form-group">
+                    <label>Did you eat junk food today?</label>
+                    <select id="ateJunkFood" required>
+                        <option value="">Select...</option>
+                        <option value="false">No - Stayed Healthy! 💪</option>
+                        <option value="true">Yes - Had Junk Food 🍔</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Approximate Cost (₹)</label>
+                    <input type="number" id="junkFoodCost" value="50" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Notes (optional)</label>
+                    <textarea id="junkFoodNotes" rows="2"></textarea>
+                </div>
+                <button type="submit">Save Junk Food Entry</button>
+                <div class="success-message" id="junkFoodSuccess">Entry saved successfully!</div>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h2>📱 Phone Usage Tracker</h2>
+            <form id="phoneUsageForm">
+                <div class="form-group">
+                    <label>Phone Usage Today (minutes)</label>
+                    <input type="number" id="usageMinutes" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Daily Limit (minutes)</label>
+                    <input type="number" id="limitMinutes" value="180" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Notes (optional)</label>
+                    <textarea id="phoneNotes" rows="2"></textarea>
+                </div>
+                <button type="submit">Save Phone Usage</button>
+                <div class="success-message" id="phoneUsageSuccess">Entry saved successfully!</div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        async function loadQuote() {
+            try {
+                const res = await fetch(`${API_BASE}/api/motivational-quote`);
+                const data = await res.json();
+                document.getElementById('quoteBox').textContent = data.quote;
+            } catch (e) {
+                document.getElementById('quoteBox').textContent = 'Stay healthy and focused!';
+            }
+        }
+
+        async function loadSummary() {
+            try {
+                const res = await fetch(`${API_BASE}/api/summary`);
+                const data = await res.json();
+                document.getElementById('healthyDays').textContent = data.healthy_days;
+                document.getElementById('moneySaved').textContent = `₹${data.total_money_saved}`;
+                document.getElementById('avgUsage').textContent = `${Math.round(data.avg_phone_usage)}m`;
+                document.getElementById('overLimitDays').textContent = data.over_limit_days;
+            } catch (e) {
+                console.error('Error loading summary:', e);
+            }
+        }
+
+        async function loadTodayStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/api/today`);
+                const data = await res.json();
+                if (data.junk_food) {
+                    document.getElementById('ateJunkFood').value = data.junk_food.ate_junk_food.toString();
+                    document.getElementById('junkFoodCost').value = data.junk_food.junk_food_cost;
+                    document.getElementById('junkFoodNotes').value = data.junk_food.notes || '';
+                }
+                if (data.phone_usage) {
+                    document.getElementById('usageMinutes').value = data.phone_usage.usage_minutes;
+                    document.getElementById('limitMinutes').value = data.phone_usage.limit_minutes;
+                    document.getElementById('phoneNotes').value = data.phone_usage.notes || '';
+                }
+            } catch (e) {
+                console.error('Error loading today status:', e);
+            }
+        }
+
+        document.getElementById('junkFoodForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                date: new Date().toISOString().split('T')[0],
+                ate_junk_food: document.getElementById('ateJunkFood').value === 'true',
+                junk_food_cost: parseFloat(document.getElementById('junkFoodCost').value),
+                notes: document.getElementById('junkFoodNotes').value
+            };
+            try {
+                await fetch(`${API_BASE}/api/junk-food`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                document.getElementById('junkFoodSuccess').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('junkFoodSuccess').style.display = 'none';
+                }, 3000);
+                loadSummary();
+                loadQuote();
+            } catch (e) {
+                alert('Error saving entry');
+            }
+        });
+
+        document.getElementById('phoneUsageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                date: new Date().toISOString().split('T')[0],
+                usage_minutes: parseInt(document.getElementById('usageMinutes').value),
+                limit_minutes: parseInt(document.getElementById('limitMinutes').value),
+                notes: document.getElementById('phoneNotes').value
+            };
+            try {
+                await fetch(`${API_BASE}/api/phone-usage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                document.getElementById('phoneUsageSuccess').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('phoneUsageSuccess').style.display = 'none';
+                }, 3000);
+                loadSummary();
+            } catch (e) {
+                alert('Error saving entry');
+            }
+        });
+
+        loadQuote();
+        loadSummary();
+        loadTodayStatus();
+        setInterval(loadQuote, 60000);
+    </script>
+</body>
+</html>
