@@ -73,7 +73,7 @@ async def log_junk_food(entry: JunkFoodEntry):
                 e["notes"] = entry.notes
     else:
         # Add new entry
-        data["junk_food"].append(entry.dict())
+        data["junk_food"].append(entry.model_dump())
     
     save_data(data)
     return {"message": "Junk food entry logged successfully", "entry": entry}
@@ -93,8 +93,7 @@ async def log_phone_usage(entry: PhoneUsageEntry):
                 e["notes"] = entry.notes
     else:
         # Add new entry
-        data["phone_usage"].append(entry.dict())
-    
+        data["phone_usage"].append(entry.model_dump())    
     save_data(data)
     return {"message": "Phone usage logged successfully", "entry": entry}
 
